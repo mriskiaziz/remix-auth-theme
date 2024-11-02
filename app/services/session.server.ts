@@ -1,10 +1,13 @@
-// app/utils/session.server.ts
+// app/services/session.server.ts
 import { createCookieSessionStorage } from "@remix-run/node";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
     name: "__session",
-    secrets: ["session_secret"], // Ganti dengan secret yang kuat
+    secrets : [process.env.SESSION_SECRET || 'default_secret'], 
     sameSite: "lax",
     path: "/",
     httpOnly: true,

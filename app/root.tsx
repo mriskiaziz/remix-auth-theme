@@ -1,71 +1,41 @@
-import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node';
 import {
-  json,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
-} from '@remix-run/react';
-import clsx from 'clsx';
-import {
-  NonFlashOfWrongThemeEls,
-  ThemeProvider,
-  useTheme,
-} from './utils/theme-provider';
-import { getThemeSession } from './utils/theme.server';
-import './tailwind.css';
+} from "@remix-run/react";
+import type { LinksFunction } from "@remix-run/node";
 
-export const meta: MetaFunction = () => {
-  const title = 'Remix Dark Mode';
-  const description = 'A demo for adding a dark mode to a Remix app.';
-  const url = 'https://remix-dark-mode.vercel.app/';
-  const image = `${url}remix-dark-mode.png`;
+import "./tailwind.css";
+import { Provider } from "./provider";
 
-  return [
-    { title },
-    { name: 'description', content: description },
-    { name: 'keywords', content: 'Remix, Dark Mode' },
-    { name: 'image', content: image },
-    { name: 'og:url', content: url },
-    { name: 'og:title', content: title },
-    { name: 'og:description', content: description },
-    { name: 'og:image', content: image },
-    { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:creator', content: '@matt_stobbs' },
-    { name: 'twitter:site', content: '@matt_stobbs' },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: image },
-    { name: 'twitter:alt', content: title },
-  ];
-};
+export const links: LinksFunction = () => [
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+  },
+];
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const themeSession = await getThemeSession(request);
-
-  return json({
-    theme: themeSession.getTheme(),
-  });
-};
-
-function App() {
-  const data = useLoaderData<typeof loader>();
-
-  const [theme] = useTheme();
-
+export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={clsx(theme)}>
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <NonFlashOfWrongThemeEls ssrTheme={Boolean(data.theme)} />
       </head>
       <body>
-        <Outlet />
+        <Provider>
+          {children}
+        </Provider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -73,12 +43,6 @@ function App() {
   );
 }
 
-export default function AppWithProviders() {
-  const data = useLoaderData<typeof loader>();
-
-  return (
-    <ThemeProvider specifiedTheme={data.theme}>
-      <App />
-    </ThemeProvider>
-  );
+export default function App() {
+  return <Outlet />;
 }
